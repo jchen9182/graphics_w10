@@ -51,8 +51,8 @@ void clear_screen( screen s ) {
     c.blue = 255;
 
     for ( y=0; y < YRES; y++ )
-    for ( x=0; x < XRES; x++)
-    s[x][y] = c;
+        for ( x=0; x < XRES; x++)
+            s[x][y] = c;
 }
 
 /*======== void clear_zbuffer() ==========
@@ -61,11 +61,11 @@ Returns:
 Sets all entries in the zbufffer to LONG_MIN
 ====================*/
 void clear_zbuffer( zbuffer zb ) {
-  int x, y;
+    int x, y;
 
-  for ( y=0; y < YRES; y++ )
-    for ( x=0; x < XRES; x++)
-      zb[x][y] = LONG_MIN;
+    for ( y=0; y < YRES; y++ )
+        for ( x=0; x < XRES; x++)
+            zb[x][y] = LONG_MIN;
 }
 
 /*======== void save_ppm() ==========

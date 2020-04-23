@@ -55,6 +55,38 @@ double * sort(double ** matrix, int col) {
 
     return sorted;
 }
+
+/*======== void draw_scanline() ==========
+  Inputs: struct matrix *points
+          int i
+          screen s
+          zbuffer zb
+          color c
+  Line algorithm specifically for horizontal scanlines
+  ====================*/
+void draw_scanline(int x0, double z0, int x1, double z1, int y, screen s, zbuffer zb, color c) {
+    int tx, tz;
+    //swap if needed to assure left->right drawing
+    if (x0 > x1) {
+        tx = x0;
+        tz = z0;
+        x0 = x1;
+        z0 = z1;
+        x1 = tx;
+        z1 = tz;
+    }
+
+    double delta_z;
+    delta_z = (x1 - x0) != 0 ? (z1 - z0) / (x1 - x0 + 1) : 0;
+    int x;
+    double z = z0;
+
+    for(x=x0; x <= x1; x++) {
+        plot(s, zb, c, x, y, z);
+        z+= delta_z;
+    }
+}
+
 /*======== void scanline_convert() ==========
   Inputs: struct matrix *points
           int i
@@ -94,6 +126,11 @@ void scanline_convert(struct matrix * points, int col, screen s, zbuffer zbuff) 
     double mz0 = (zt - zb) / (yt - yb);
     double mz1 = (zm - zb) / (ym - yb);
     double mz2 = (zt - zm) / (yt - ym);
+
+    //if (yt == ym) printf("yt = ym\n");
+    // if (yt == yb) printf("yt = yb\n");
+    // if (ym == yb) printf("ym = yb\n");
+    printf("%f\n", y);
 
     int toggle = 1;
     while (y < yt) {
