@@ -87,7 +87,7 @@ void parse_file(char * filename,
     change_color(&c, 0, 0, 0);
 
     int linestep = 100;
-    int polystep = 30;
+    int polystep = 20;
 
     // Open script file
     if (strcmp(filename, "stdin") == 0) f = stdin;

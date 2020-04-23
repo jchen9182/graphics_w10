@@ -231,7 +231,7 @@ void ident(struct matrix *m) {
         }
     }
     m -> lastcol = cols;
-}//end ident
+}
 
 
 /*-------------- void matrix_mult() --------------
@@ -246,17 +246,18 @@ void matrix_mult(struct matrix *a, struct matrix *b) {
     struct matrix *tmp;
     tmp = new_matrix(4, 1);
 
-    for (c=0; c < b->lastcol; c++) {
-
+    for (c = 0; c < b -> lastcol; c++) {
         //copy current col (point) to tmp
-        for (r=0; r < b->rows; r++)
-        tmp->m[r][0] = b->m[r][c];
+        for (r = 0; r < b -> rows; r++) {
+            tmp -> m[r][0] = b -> m[r][c];
+        }
 
-        for (r=0; r < b->rows; r++)
-        b->m[r][c] = a->m[r][0] * tmp->m[0][0] +
-        a->m[r][1] * tmp->m[1][0] +
-        a->m[r][2] * tmp->m[2][0] +
-        a->m[r][3] * tmp->m[3][0];
+        for (r=0; r < b->rows; r++) {
+            b->m[r][c] = a -> m[r][0] * tmp -> m[0][0] +
+                         a -> m[r][1] * tmp -> m[1][0] +
+                         a -> m[r][2] * tmp -> m[2][0] +
+                         a -> m[r][3] * tmp -> m[3][0];
+        }
     }
     free_matrix(tmp);
 }//end matrix_mult

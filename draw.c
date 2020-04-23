@@ -14,47 +14,6 @@ void swap(double *a, double *b) {
     *a = *b;
     *b = temp;
 }
-//======== sort(double ** matrix, int col) ==========
-double * sort(double ** matrix, int col) {
-    double x0 = matrix[0][col];
-    double x1 = matrix[0][col + 1];
-    double x2 = matrix[0][col + 2];
-    double y0 = matrix[1][col];
-    double y1 = matrix[1][col + 1];
-    double y2 = matrix[1][col + 2];
-    double z0 = matrix[2][col];
-    double z1 = matrix[2][col + 1];
-    double z2 = matrix[2][col + 2];
-
-    if (y0 > y1) {
-        swap(&y0, &y1);
-        swap(&x0, &x1);
-        swap(&z0, &z1);
-    }
-    if (y1 > y2) {
-        swap(&y1, &y2);
-        swap(&x1, &x2);
-        swap(&z1, &z2);
-    }
-    if (y0 > y1) {
-        swap(&y0, &y1);
-        swap(&x0, &x1);
-        swap(&z0, &z1);
-    }
-
-    double * sorted = malloc(sizeof(double) * 9);
-    sorted[0] = x0;
-    sorted[1] = x1;
-    sorted[2] = x2;
-    sorted[3] = y0;
-    sorted[4] = y1;
-    sorted[5] = y2;
-    sorted[6] = z0;
-    sorted[7] = z1;
-    sorted[8] = z2;
-
-    return sorted;
-}
 
 /*======== void draw_scanline() ==========
   Inputs: struct matrix *points
@@ -65,25 +24,33 @@ double * sort(double ** matrix, int col) {
   Line algorithm specifically for horizontal scanlines
   ====================*/
 void draw_scanline(int x0, double z0, int x1, double z1, int y, screen s, zbuffer zb, color c) {
-    int tx, tz;
-    //swap if needed to assure left->right drawing
+    int x;
+    double z, mz;
+
+    //swap points if going right -> left
+    int xt, zt;
     if (x0 > x1) {
-        tx = x0;
-        tz = z0;
+        xt = x0;
+        zt = z0;
         x0 = x1;
         z0 = z1;
-        x1 = tx;
-        z1 = tz;
+        x1 = xt;
+        z1 = zt;
     }
 
-    double delta_z;
-    delta_z = (x1 - x0) != 0 ? (z1 - z0) / (x1 - x0 + 1) : 0;
-    int x;
-    double z = z0;
+    x = x0;
+    z = z0;
+    mz = 0;
 
-    for(x=x0; x <= x1; x++) {
+    if ((x1 - x0) >= 0) {
+        mz = (z1 - z0) / (x1 - x0);
+    }
+
+    while (x < x1) {
         plot(s, zb, c, x, y, z);
-        z+= delta_z;
+        
+        z += mz;
+        x++;
     }
 }
 
@@ -98,28 +65,43 @@ void draw_scanline(int x0, double z0, int x1, double z1, int y, screen s, zbuffe
   ====================*/
 void scanline_convert(struct matrix * points, int col, screen s, zbuffer zbuff) {
     double ** matrix = points -> m;
-    double * sorted = sort(matrix, col);
-    double xb = sorted[0];
-    double xm = sorted[1];
-    double xt = sorted[2];
-    double yb = sorted[3];
-    double ym = sorted[4];
-    double yt = sorted[5];
-    double zb = sorted[6];
-    double zm = sorted[7];
-    double zt = sorted[8];
+    double xb = matrix[0][col];
+    double xm = matrix[0][col + 1];
+    double xt = matrix[0][col + 2];
+    double yb = matrix[1][col];
+    double ym = matrix[1][col + 1];
+    double yt = matrix[1][col + 2];
+    double zb = matrix[2][col];
+    double zm = matrix[2][col + 1];
+    double zt = matrix[2][col + 2];
+
+    if (yb > ym) {
+        swap(&yb, &ym);
+        swap(&xb, &xm);
+        swap(&zb, &zm);
+    }
+    if (ym > yt) {
+        swap(&ym, &yt);
+        swap(&xm, &xt);
+        swap(&zm, &zt);
+    }
+    if (yb > ym) {
+        swap(&yb, &ym);
+        swap(&xb, &xm);
+        swap(&zb, &zm);
+    }
 
     color c;
-    srand(col);
+    srand(col + 1);
     c.red = rand() % 255;
     c.green = rand() % 255;
     c.blue = rand() % 255;
 
+    int y = yb;
     double x0 = xb;
     double x1 = xb;
     double z0 = zb;
     double z1 = zb;
-    double y = yb;
     double mx0 = (xt - xb) / (yt - yb);
     double mx1 = (xm - xb) / (ym - yb);
     double mx2 = (xt - xm) / (yt - ym);
@@ -127,14 +109,9 @@ void scanline_convert(struct matrix * points, int col, screen s, zbuffer zbuff) 
     double mz1 = (zm - zb) / (ym - yb);
     double mz2 = (zt - zm) / (yt - ym);
 
-    //if (yt == ym) printf("yt = ym\n");
-    // if (yt == yb) printf("yt = yb\n");
-    // if (ym == yb) printf("ym = yb\n");
-    printf("%f\n", y);
-
     int toggle = 1;
-    while (y < yt) {
-        if (y >= ym && toggle) {
+    while (y < floor(yt)) {
+        if (y > floor(ym) && toggle) {
             mx1 = mx2;
             x1 = xm;
             mz1 = mz2;
@@ -143,8 +120,7 @@ void scanline_convert(struct matrix * points, int col, screen s, zbuffer zbuff) 
             toggle = 0;
         }
 
-        draw_line(x0, y, z0, x1, y, z1, s, zbuff, c);
-
+        draw_scanline(x0, z0, x1, z1, y, s, zbuff, c);
         x0 += mx0;
         x1 += mx1;
         z0 += mz0;
@@ -207,9 +183,9 @@ void draw_polygons(struct matrix * polygons, screen s, zbuffer zb, color c) {
             // double x2 = matrix[0][col + 2];
             // double y2 = matrix[1][col + 2];
 
-            // draw_line(x0, y0, x1, y1, s, zb, c);
-            // draw_line(x1, y1, x2, y2, s, zb, c);
-            // draw_line(x2, y2, x0, y0, s, zb, c);
+            // draw_line(x0, y0, 1000, x1, y1, 1000, s, zb, c);
+            // draw_line(x1, y1, 1000, x2, y2, 1000, s, zb, c);
+            // draw_line(x2, y2, 1000, x0, y0, 1000, s, zb, c);
         }
     }
 }
@@ -331,7 +307,6 @@ struct matrix * generate_sphere(double cx, double cy, double cz,
             double x = r * cos(theta) + cx;
             double y = r * sin(theta) * cos(phi) + cy;
             double z = r * sin(theta) * sin(phi) + cz;
-
             add_point(points, x, y, z);
         }
     }
@@ -527,8 +502,8 @@ add the line connecting (x0, y0, z0) to (x1, y1, z1) to points
 should use add_point
 ====================*/
 void add_edge(struct matrix * points,
-              double x0, double y0, double z0,
-              double x1, double y1, double z1) {
+	       double x0, double y0, double z0,
+	       double x1, double y1, double z1) {
     add_point(points, x0, y0, z0);
     add_point(points, x1, y1, z1);
 }

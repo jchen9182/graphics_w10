@@ -10,7 +10,6 @@ box
 0 0 0 200 100 400
 display
 
-
 #clear everything, test sphere
 clear
 pop
@@ -20,6 +19,7 @@ move
 sphere
 0 0 0 200
 display
+
 
 #clear everything, test sphere again
 clear
