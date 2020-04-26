@@ -9,8 +9,49 @@
 #include "matrix.h"
 #include "parser.h"
 #include "stack.h"
+#include "gmath.h"
 
 int main(int argc, char **argv) {
+    // Lighting values here for easy access
+    color ambient;
+    double light[2][3];
+    double view[3];
+    double areflect[3];
+    double dreflect[3];
+    double sreflect[3];
+
+    // Ambient light
+    ambient.red = 50;
+    ambient.green = 50;
+    ambient.blue = 50;
+
+    // One point light source
+    light[LOCATION][0] = 0.5;
+    light[LOCATION][1] = 0.75;
+    light[LOCATION][2] = 1;
+
+    light[COLOR][RED] = 0;
+    light[COLOR][GREEN] = 255;
+    light[COLOR][BLUE] = 255;
+
+    // View vector
+    view[0] = 0;
+    view[1] = 0;
+    view[2] = 1;
+
+    // Reflective constants
+    areflect[RED] = 0.1;
+    areflect[GREEN] = 0.1;
+    areflect[BLUE] = 0.1;
+
+    dreflect[RED] = 0.5;
+    dreflect[GREEN] = 0.5;
+    dreflect[BLUE] = 0.5;
+
+    sreflect[RED] = 0.5;
+    sreflect[GREEN] = 0.5;
+    sreflect[BLUE] = 0.5;
+
     screen s;
     zbuffer zb;
     struct matrix * edges;
@@ -22,9 +63,11 @@ int main(int argc, char **argv) {
     csystems = new_stack();
 
     if (argc == 2)
-        parse_file(argv[1], csystems, edges, polygons, s, zb);
+        parse_file( argv[1], csystems, edges, polygons, s, zb,
+                    view, ambient, light, areflect, sreflect, dreflect);
     else
-        parse_file("stdin", csystems, edges, polygons, s, zb);
+        parse_file( "stdin", csystems, edges, polygons, s, zb,
+                    view, ambient, light, areflect, sreflect, dreflect);
 
     free_matrix(edges);
     free_matrix(polygons);

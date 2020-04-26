@@ -4,21 +4,22 @@
 #include "matrix.h"
 #include "ml6.h"
 
-// scanline
-void swap (double *a, double *b);
+// Scanline
 void draw_scanline( double x0, double z0, double x1, double z1, int y, double offx,
                     screen s, zbuffer zb, color c);
-void scanline_convert(struct matrix * points, int col, screen s, zbuffer zb);
+void scanline_convert(struct matrix * points, int col, screen s, zbuffer zb, color il);
 
-//polygon organization
-void add_polygons( struct matrix * polys,
+// Polygon organization
+void add_polygons( struct matrix * polygons,
                    double x0, double y0, double z0,
                    double x1, double y1, double z1,
                    double x2, double y2, double z2);
-void draw_polygons( struct matrix * polys, screen s, zbuffer zb, color c);
+void draw_polygons( struct matrix * polygons, screen s, zbuffer zb, color c,
+                    double * view, double light[2][3], color ambient,
+                    double * areflect, double * dreflect, double * sreflect);
 
-//advanced shapes
-//3d shapes
+// Advanced shapes
+// 3D shapes
 void add_box( struct matrix * edges,
               double x, double y, double z,
               double width, double height, double depth );
@@ -33,7 +34,7 @@ void add_torus( struct matrix * edges,
 struct matrix * generate_torus( double cx, double cy, double cz,
                                 double r1, double r2, int step );
 
-//2D Curves
+// 2D Curves
 void add_circle(struct matrix * points,
                 double cx, double cy, double cz,
                 double r, int step );
@@ -53,6 +54,8 @@ void draw_lines(struct matrix * points, screen s, zbuffer zb, color c);
 void draw_line( int x0, int y0, double z0, int x1, int y1, double z1, 
                 screen s, zbuffer zb, color c);
 
+// My funcs
+void swap (double *a, double *b);
 void change_color(color * c, int r, int g, int b);
 
 #endif

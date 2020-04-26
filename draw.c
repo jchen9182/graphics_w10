@@ -8,13 +8,6 @@
 #include "matrix.h"
 #include "gmath.h"
 
-//======== swap (double *a, double *b) ==========
-void swap(double *a, double *b) {
-    double temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
 /*======== void draw_scanline() ==========
   Inputs: struct matrix *points
           int i
@@ -25,7 +18,6 @@ void swap(double *a, double *b) {
   ====================*/
 void draw_scanline( double x0, double z0, double x1, double z1, int y, double offx,
                     screen s, zbuffer zb, color c) {
-    //swap points if going right -> left
     if (x0 > x1) {
         swap(&x0, &x1);
         swap(&z0, &z1);
@@ -57,7 +49,7 @@ void draw_scanline( double x0, double z0, double x1, double z1, int y, double of
   Fills in polygon i by drawing consecutive horizontal (or vertical) lines.
   Color should be set differently for each polygon.
   ====================*/
-void scanline_convert(struct matrix * points, int col, screen s, zbuffer zbuff) {
+void scanline_convert(struct matrix * points, int col, screen s, zbuffer zbuff, color il) {
     double ** matrix = points -> m;
     double xb = matrix[0][col];
     double xm = matrix[0][col + 1];
@@ -113,7 +105,6 @@ void scanline_convert(struct matrix * points, int col, screen s, zbuffer zbuff) 
     double z2 = zm + mz2 * offy1;
     int y = ceil(yb);
 
-    int toggle = 1;
     while (y < ceil(ym)) {
         double offx;
 
@@ -178,8 +169,9 @@ void add_polygon(struct matrix * polygons,
   Goes through polygons 3 points at a time, drawing
   lines connecting each points to create bounding triangles
   ====================*/
-void draw_polygons(struct matrix * polygons, screen s, zbuffer zb, color c) {
-    // double ** matrix = polygons -> m;
+void draw_polygons( struct matrix * polygons, screen s, zbuffer zb, color c,
+                    double * view, double light[2][3], color ambient,
+                    double * areflect, double * dreflect, double * sreflect) {
     int lastcol = polygons -> lastcol;
 
     if (lastcol < 3) {
@@ -191,18 +183,9 @@ void draw_polygons(struct matrix * polygons, screen s, zbuffer zb, color c) {
         double * normal = calculate_normal(polygons, col);
 
         if (normal[2] > 0) {
-            scanline_convert(polygons, col, s, zb);
-
-            // double x0 = matrix[0][col];
-            // double y0 = matrix[1][col];
-            // double x1 = matrix[0][col + 1];
-            // double y1 = matrix[1][col + 1];
-            // double x2 = matrix[0][col + 2];
-            // double y2 = matrix[1][col + 2];
-
-            // draw_line(x0, y0, 1000, x1, y1, 1000, s, zb, c);
-            // draw_line(x1, y1, 1000, x2, y2, 1000, s, zb, c);
-            // draw_line(x2, y2, 1000, x0, y0, 1000, s, zb, c);
+            // get color value only if front facing
+            color i = get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect);
+            scanline_convert(polygons, col, s, zb, i);
         }
     }
 }
@@ -669,9 +652,16 @@ void draw_line( int x0, int y0, double z0, int x1, int y1, double z1,
     }
 }
 
+// My funcs
 //======== void change_color() ==========
 void change_color(color * c, int r, int g, int b) {
     c -> red = r;
     c -> green = g;
     c -> blue = b;
+}
+//======== swap (double *a, double *b) ==========
+void swap(double *a, double *b) {
+    double temp = *a;
+    *a = *b;
+    *b = temp;
 }

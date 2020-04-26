@@ -9,6 +9,8 @@ void parse_file (char * filename,
 		  		 struct stack * csystems,
 		  		 struct matrix * edges,
 				 struct matrix * polygons,
-		  		 screen s, zbuffer zb);
+		  		 screen s, zbuffer zb,
+				 double * view, color ambient, double light[2][3],
+                 double * areflect, double * sreflect, double * dreflect);
 
 #endif
