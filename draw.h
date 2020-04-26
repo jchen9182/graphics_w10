@@ -15,7 +15,7 @@ void add_polygons( struct matrix * polygons,
                    double x1, double y1, double z1,
                    double x2, double y2, double z2);
 void draw_polygons( struct matrix * polygons, screen s, zbuffer zb, color c,
-                    double * view, double light[2][3], color ambient,
+                    double * view, color ambient, color point, double * light,
                     double * areflect, double * dreflect, double * sreflect);
 
 // Advanced shapes

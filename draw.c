@@ -49,7 +49,7 @@ void draw_scanline( double x0, double z0, double x1, double z1, int y, double of
   Fills in polygon i by drawing consecutive horizontal (or vertical) lines.
   Color should be set differently for each polygon.
   ====================*/
-void scanline_convert(struct matrix * points, int col, screen s, zbuffer zbuff, color il) {
+void scanline_convert(struct matrix * points, int col, screen s, zbuffer zbuff, color c) {
     double ** matrix = points -> m;
     double xb = matrix[0][col];
     double xm = matrix[0][col + 1];
@@ -76,12 +76,6 @@ void scanline_convert(struct matrix * points, int col, screen s, zbuffer zbuff, 
         swap(&xb, &xm);
         swap(&zb, &zm);
     }
-
-    color c;
-    srand(col);
-    c.red = rand() % 255;
-    c.green = rand() % 255;
-    c.blue = rand() % 255;
 
     double dist0 = yt - yb;
     double dist1 = ym - yb;
@@ -170,7 +164,7 @@ void add_polygon(struct matrix * polygons,
   lines connecting each points to create bounding triangles
   ====================*/
 void draw_polygons( struct matrix * polygons, screen s, zbuffer zb, color c,
-                    double * view, double light[2][3], color ambient,
+                    double * view, color ambient, color point, double * light,
                     double * areflect, double * dreflect, double * sreflect) {
     int lastcol = polygons -> lastcol;
 
@@ -184,8 +178,8 @@ void draw_polygons( struct matrix * polygons, screen s, zbuffer zb, color c,
 
         if (normal[2] > 0) {
             // get color value only if front facing
-            color i = get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect);
-            scanline_convert(polygons, col, s, zb, i);
+            color clight = get_lighting(normal, view, ambient, point, light, areflect, dreflect, sreflect);
+            scanline_convert(polygons, col, s, zb, clight);
         }
     }
 }

@@ -76,7 +76,7 @@ void parse_file(char * filename,
                 struct matrix * edges,
                 struct matrix * polygons,
                 screen s, zbuffer zb,
-                double * view, color ambient, double light[2][3],
+                double * view, color ambient, color point, double * light,
                 double * areflect, double * sreflect, double * dreflect) {
     // Init
     FILE *f;
@@ -234,7 +234,7 @@ void parse_file(char * filename,
             matrix_mult(matrix, polygons);
 
             draw_polygons(polygons, s, zb, c,
-                          view, light, ambient, areflect, dreflect, sreflect);
+                          view, ambient, point, light, areflect, dreflect, sreflect);
             polygons -> lastcol = 0;
         }
 
@@ -250,7 +250,7 @@ void parse_file(char * filename,
             matrix_mult(matrix, polygons);
 
             draw_polygons(polygons, s, zb, c,
-                          view, light, ambient, areflect, dreflect, sreflect);
+                          view, ambient, point, light, areflect, dreflect, sreflect);
             polygons -> lastcol = 0;
         }
 
@@ -266,7 +266,7 @@ void parse_file(char * filename,
             matrix_mult(matrix, polygons);
 
             draw_polygons(polygons, s, zb, c,
-                          view, light, ambient, areflect, dreflect, sreflect);
+                          view, ambient, point, light, areflect, dreflect, sreflect);
             polygons -> lastcol = 0;
         }
 

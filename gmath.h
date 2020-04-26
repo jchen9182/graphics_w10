@@ -16,15 +16,15 @@
 #define SPECULAR_EXP 4
 
 // Lighting functions
-color get_lighting( double * normal, double * view, color alight, double light[2][3], double *areflect, double *dreflect, double *sreflect);
-color calculate_ambient(color alight, double * areflect );
-color calculate_diffuse(double light[2][3], double * dreflect, double * normal );
-color calculate_specular(double light[2][3], double * sreflect, double * view, double * normal );
-void limit_color( color * c );
+color get_lighting(double * normal, double * view, color ambient, color point, double * light, double * areflect, double * dreflect, double * sreflect);
+color calculate_ambient(color ambient, double * areflect);
+color calculate_diffuse(color point, double * dreflect, double * normal, double * light);
+color calculate_specular(color point, double * sreflect, double * view, double * normal, double * light);
+void limit_color(color * c);
 
 // Vector functions
-void normalize( double * vector );
-double dot_product( double * a, double * b );
+void normalize(double * vector);
+double dot_product(double * a, double * b);
 double * calculate_normal(struct matrix * polygons, int i);
 
 #endif

@@ -14,7 +14,8 @@
 int main(int argc, char **argv) {
     // Lighting values here for easy access
     color ambient;
-    double light[2][3];
+    color point;
+    double light[3];
     double view[3];
     double areflect[3];
     double dreflect[3];
@@ -26,13 +27,13 @@ int main(int argc, char **argv) {
     ambient.blue = 50;
 
     // One point light source
-    light[LOCATION][0] = 0.5;
-    light[LOCATION][1] = 0.75;
-    light[LOCATION][2] = 1;
+    light[0] = 0.5;
+    light[1] = 0.75;
+    light[2] = 1;
 
-    light[COLOR][RED] = 0;
-    light[COLOR][GREEN] = 255;
-    light[COLOR][BLUE] = 255;
+    point.red = 0;
+    point.green = 255;
+    point.blue = 255;
 
     // View vector
     view[0] = 0;
@@ -64,10 +65,10 @@ int main(int argc, char **argv) {
 
     if (argc == 2)
         parse_file( argv[1], csystems, edges, polygons, s, zb,
-                    view, ambient, light, areflect, sreflect, dreflect);
+                    view, ambient, point, light, areflect, sreflect, dreflect);
     else
         parse_file( "stdin", csystems, edges, polygons, s, zb,
-                    view, ambient, light, areflect, sreflect, dreflect);
+                    view, ambient, point, light, areflect, sreflect, dreflect);
 
     free_matrix(edges);
     free_matrix(polygons);
