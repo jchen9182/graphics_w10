@@ -6,7 +6,7 @@
 
 // scanline
 void swap (double *a, double *b);
-void draw_scanline(int x0, double z0, int x1, double z1, int y, screen s, zbuffer zb, color c);
+void draw_scanline(double x0, double z0, double x1, double z1, int y, screen s, zbuffer zb, color c);
 void scanline_convert(struct matrix * points, int col, screen s, zbuffer zb);
 
 //polygon organization

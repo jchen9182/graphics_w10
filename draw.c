@@ -23,33 +23,26 @@ void swap(double *a, double *b) {
           color c
   Line algorithm specifically for horizontal scanlines
   ====================*/
-void draw_scanline(int x0, double z0, int x1, double z1, int y, screen s, zbuffer zb, color c) {
-    int x;
-    double z, mz;
-
+void draw_scanline(double x0, double z0, double x1, double z1, int y, screen s, zbuffer zb, color c) {
     //swap points if going right -> left
-    int xt, zt;
     if (x0 > x1) {
-        xt = x0;
-        zt = z0;
-        x0 = x1;
-        z0 = z1;
-        x1 = xt;
-        z1 = zt;
+        swap(&x0, &x1);
+        swap(&z0, &z1);
     }
 
-    x = x0;
-    z = z0;
-    mz = 0;
+    int x = floor(x0);
+    double z = z0;
+    double mz = 0;
+    double offx = x0 - floor(x0);
 
-    if ((x1 - x0) >= 0) {
+    if ((x1 - x0) > 0) {
         mz = (z1 - z0) / (x1 - x0);
     }
 
-    while (x < x1) {
+    while (x < floor(x1)) {
         plot(s, zb, c, x, y, z);
         
-        z += mz;
+        z += mz * offx;
         x++;
     }
 }
@@ -92,41 +85,52 @@ void scanline_convert(struct matrix * points, int col, screen s, zbuffer zbuff) 
     }
 
     color c;
-    srand(col + 1);
+    srand(col);
     c.red = rand() % 255;
     c.green = rand() % 255;
     c.blue = rand() % 255;
 
-    int y = yb;
-    double x0 = xb;
-    double x1 = xb;
-    double z0 = zb;
-    double z1 = zb;
-    double mx0 = (xt - xb) / (yt - yb);
-    double mx1 = (xm - xb) / (ym - yb);
-    double mx2 = (xt - xm) / (yt - ym);
-    double mz0 = (zt - zb) / (yt - yb);
-    double mz1 = (zm - zb) / (ym - yb);
-    double mz2 = (zt - zm) / (yt - ym);
+    double dist0 = yt - yb;
+    double dist1 = ym - yb;
+    double dist2 = yt - ym;
+
+    double mx0 = dist0 > 0 ? (xt - xb) / dist0 : 0;
+    double mx1 = dist1 > 0 ? (xm - xb) / dist1 : 0;
+    double mx2 = dist2 > 0 ? (xt - xm) / dist2 : 0;
+    double mz0 = dist0 > 0 ? (zt - zb) / dist0 : 0;
+    double mz1 = dist1 > 0 ? (zm - zb) / dist1 : 0;
+    double mz2 = dist2 > 0 ? (zt - zm) / dist2 : 0;
+
+    double offy0 = yb - floor(yb);
+    double offy1 = ym - floor(ym);
+
+    double x0 = xb + offy0 * mx0;
+    double x1 = xb + offy0 * mx1;
+    double x2 = xm + offy1 * mx2;
+    double z0 = zb + offy0 * mz0;
+    double z1 = zb + offy0 * mz1;
+    double z2 = zm + offy1 * mz2;
+    int y = floor(yb);
 
     int toggle = 1;
-    while (y < floor(yt)) {
-        if (y > floor(ym) && toggle) {
-            mx1 = mx2;
-            x1 = xm;
-            mz1 = mz2;
-            z1 = zm;
-
-            toggle = 0;
-        }
-
-        draw_scanline(x0, z0, x1, z1, y, s, zbuff, c);
+    while (y < floor(ym)) {
+        //draw_scanline(x0, z0, x1, z1, y, s, zbuff, c);
+        draw_line(x0, y, z0, x0 + 1, y, z1, s, zbuff, c);
         x0 += mx0;
         x1 += mx1;
         z0 += mz0;
         z1 += mz1;
         y++;
     }
+    // while (y < floor(yt)) {
+    //     //draw_scanline(x0, z0, x2, z2, y, s, zbuff, c);
+    //     draw_line(x0, y, z0, x2, y, z2, s, zbuff, c);
+    //     x0 += mx0;
+    //     x2 += mx2;
+    //     z0 += mz0;
+    //     z2 += mz2;
+    //     y++;
+    // }
 }
 /*======== void add_polygon() ==========
   Inputs:   struct matrix *polygons

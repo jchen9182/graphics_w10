@@ -20,7 +20,6 @@ sphere
 0 0 0 200
 display
 
-
 #clear everything, test sphere again
 clear
 rotate
